@@ -1,17 +1,24 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Login from './pages/user/login'
-import Signup from './pages/user/signup'
-import Home from  './pages/home/'
-import App from './App'
 import 'antd/dist/antd.min.css'
+import App from './App'
+import Test from './test'
+import All from './pages/all'
+import Detail from './pages/detail'
+import Get from './pages/get'
+import Give from './pages/give'
+import Profile from './pages/profile'
 
 const BaseRouter = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Home/>}></Route>
-      <Route path="/app" element={<App/>}></Route>
-      <Route path="/login" element={<Login/>}></Route>
-      <Route path="/signup" element={<Signup/>}></Route>
+      <Route path="/" element={<App/>}>
+        <Route path="" element={<All/>}></Route>
+        <Route path='/detail' component={Detail}></Route>
+        <Route path="give" element={<Give/>}></Route>
+        <Route path="get" element={<Get/>}></Route>
+        <Route path="profile" element={<Profile/>}></Route>
+      </Route>
+      <Route path="test" element={<Test/>}></Route>
     </Routes>
   </BrowserRouter>
 )
