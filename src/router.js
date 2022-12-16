@@ -11,9 +11,9 @@ import Profile from './pages/profile'
 const BaseRouter = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<App/>}>
+      <Route path="" element={<App/>}>
         <Route path="" element={<All/>}></Route>
-        <Route path='/detail' component={Detail}></Route>
+        <Route path='detail/:id' element={<Detail/>}></Route>
         <Route path="give" element={<Give/>}></Route>
         <Route path="get" element={<Get/>}></Route>
         <Route path="profile" element={<Profile/>}></Route>

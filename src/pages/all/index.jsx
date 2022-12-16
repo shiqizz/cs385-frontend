@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import Goods from '../../components/Goods'
 import { db } from '../../firebase'
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore'
-import { List, Pagination } from 'antd'
+import { List, Pagination, Card } from 'antd'
+import { useNavigate } from 'react-router-dom'
+const { Meta } = Card
 
 function All () {
+  const navigate = useNavigate()
   const [count, setCount] = useState(0)
-  const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
   const [goodsList, setGoodsList] = useState([])
 
   useEffect(() => {
     const coll = collection(db, 'goods')
-    let q = query(coll, orderBy('timestamp'))
-    q = search ? query(q, where('title', '==', search)) : query(q)
+    let q = query(coll, where('is_given', '==', false), orderBy('timestamp', 'desc'))
     const getGoodsList = onSnapshot(
       q,
       (snapShot) => {
@@ -30,18 +30,26 @@ function All () {
         console.log(error)
       }
     )
-
     return () => {getGoodsList()}
-  }, [page, size, search])
+  }, [page, size])
 
   return (
-    <div>
+    <div style={{padding: 50}}>
       <List
         grid={{ gutter: 16, xs: 1, sm: 1, md: 2, lg: 3, xl: 4, xxl: 5 }}
         dataSource={goodsList}
         renderItem={(item) => (
           <List.Item>
-            <Goods item={item}/>
+            <Card
+              hoverable
+              style={{
+                width: 240,
+              }}
+              cover={<img alt="detail" src={item.file_list[0]}/>}
+              onClick={()=>navigate('/detail/'+ item.id)}
+            >
+              <Meta title={item.title} description={item.description}/>
+            </Card>
           </List.Item>
         )}
       />

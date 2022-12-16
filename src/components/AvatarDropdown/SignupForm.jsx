@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Button, Checkbox, Col, Form, Input, Row, Typography, message } from 'antd'
 import { auth, db } from '../../firebase'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
@@ -6,6 +6,7 @@ import {
   doc,
   setDoc,
 } from 'firebase/firestore'
+import { AuthContext } from '../../context/AuthContext'
 
 const { Text, Link } = Typography
 
@@ -43,6 +44,7 @@ const tailFormItemLayout = {
 const SignupForm = (props) => {
 
   const [form] = Form.useForm()
+  const { dispatch } = useContext(AuthContext)
 
   const onFinish = async (value) => {
     const { email, password, nickname } = value
@@ -59,9 +61,9 @@ const SignupForm = (props) => {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           const user = userCredential.user
-          localStorage.setItem('token', user.accessToken)
-          message.success('login success')
-          setTimeout(()=>window.location.reload(), 500)
+          dispatch({ type: 'LOGIN', payload: user })
+          message.success('signup and login success')
+          setTimeout(() => window.location.reload(), 300)
         })
     } catch (error) {
       message.error('has signup')

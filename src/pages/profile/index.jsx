@@ -1,36 +1,44 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Input, Radio, Select, Cascader, DatePicker, InputNumber, Switch, Checkbox, message, Spin } from 'antd'
-import UploadAvatar from '../../components/UploadAvatar'
+import { Form, Input, Radio, Select, DatePicker, InputNumber, Switch, Checkbox, message, Spin, Button } from 'antd'
+import UploadAvatar from './UploadAvatar'
 import { db } from '../../firebase'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 
-const { RangePicker } = DatePicker
 const { TextArea } = Input
 
 const Profile = () => {
 
   const [Loading, setLoading] = useState(true)
   const [data, setData] = useState({})
-
   const [canEdit, setCanEdit] = useState(false)
-  const onFormLayoutChange = ({ disabled }) => {setCanEdit(disabled)}
+  const uid = JSON.parse(localStorage.getItem('user')).uid
+  const [avatar, setAvatar] = useState()
 
   useEffect(() => {
-    const uid = localStorage.getItem('uid')
-    getDoc(doc(db, 'user', uid)).then(
-      (doc) => {
-        setData(doc.data())
-        setLoading(false)
-      },
-      () => {
-        message.error('miss uid')
-      }
-    )
+      getDoc(doc(db, 'user', uid)).then(
+        (doc) => {
+          setData(doc.data())
+          setLoading(false)
+        },
+        () => {
+          message.error('miss uid')
+        }
+      )
+    }
+    , [uid])
+
+  const onFinish = async (values) => {
+    values = {'avatar': avatar, ...values}
+    Object.keys(values).forEach((item) => {
+      const key = values[item]
+      if (key === undefined) {delete values[item]}})
+    await setDoc(doc(db, 'user', uid), values)
+    localStorage.setItem('avatar', avatar)
+    message.success('save success')
   }
-  , [])
 
   if (Loading) {
-    return <Spin />
+    return <Spin/>
   }
 
   return (
@@ -49,19 +57,19 @@ const Profile = () => {
           span: 14,
         }}
         layout="horizontal"
-        onValuesChange={onFormLayoutChange}
         disabled={!canEdit}
+        onFinish={onFinish}
       >
 
         <Form.Item label="Upload" valuePropName="fileList">
-          <UploadAvatar/>
+          <UploadAvatar avatar={data.avatar} setAvatar={setAvatar}/>
         </Form.Item>
 
-        <Form.Item label="Nickname">
-          <Input bordered={false} defaultValue={data.nickname}/>
+        <Form.Item name="nickname" label="Nickname" initialValue={data.nickname}>
+          <Input bordered={false}/>
         </Form.Item>
 
-        <Form.Item label="Sex">
+        <Form.Item name="sex" label="Sex" initialValue={data.sex}>
           <Radio.Group>
             <Radio value="man"> Man </Radio>
             <Radio value="woman"> Woman </Radio>
@@ -70,11 +78,11 @@ const Profile = () => {
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item label="Age">
-          <InputNumber bordered={false} defaultValue={0} />
+        <Form.Item name="age" label="Age" initialValue={data.age}>
+          <InputNumber/>
         </Form.Item>
 
-        <Form.Item label="Country">
+        <Form.Item name="country" label="Country" initialValue={data.country}>
           <Select>
             <Select.Option value="China">China</Select.Option>
             <Select.Option value="Ireland">Ireland</Select.Option>
@@ -83,37 +91,20 @@ const Profile = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="City">
-          <Cascader
-            options={[
-              {
-                value: 'zhejiang',
-                label: 'Zhejiang',
-                children: [
-                  {
-                    value: 'hangzhou',
-                    label: 'Hangzhou',
-                  },
-                ],
-              },
-            ]}
-          />
-        </Form.Item>
-
-        <Form.Item label="Birthday">
+        <Form.Item name="birthday" label="Birthday" initialValue={data.birthday}>
           <DatePicker bordered={false}/>
         </Form.Item>
 
-        <Form.Item label="RangePicker">
-          <RangePicker bordered={false}/>
-        </Form.Item>
-
-        <Form.Item label="Bio">
-          <TextArea rows={4} bordered={false}/>
+        <Form.Item name="bio" label="Bio">
+          <TextArea rows={4}/>
         </Form.Item>
 
         <Form.Item label="Is open" valuePropName="checked">
           <Switch/>
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" style={{ margin: '20px 350px' }}>Save</Button>
         </Form.Item>
 
       </Form>

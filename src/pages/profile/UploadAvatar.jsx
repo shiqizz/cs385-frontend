@@ -16,7 +16,7 @@ const beforeUpload = (file) => {
   return isJpgOrPng && isLt2M
 }
 
-const UploadAvatar = () => {
+const UploadAvatar = (props) => {
 
   const [imageUrl, setImageUrl] = useState()
 
@@ -24,7 +24,6 @@ const UploadAvatar = () => {
     const file = event.file
     const storageRef = ref(storage, file.name)
     const uploadTask = uploadBytesResumable(storageRef, file)
-
     uploadTask.on(
       'state_changed',
       (snapshot) => {},
@@ -33,8 +32,9 @@ const UploadAvatar = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref)
-          .then((downloadURL) => {
-            setImageUrl(downloadURL)
+          .then((uploadUrl) => {
+            setImageUrl(uploadUrl)
+            props.setAvatar(uploadUrl)
           })
       }
     )
@@ -50,7 +50,7 @@ const UploadAvatar = () => {
     >
       {imageUrl
         ? (<img src={imageUrl} alt="avatar" style={{width: 100, height: 100, borderRadius: '50%'}}/>)
-        : (<Avatar size={100} icon={<UserOutlined/>}/>)}
+        : (props.avatar)?(<img src={props.avatar} alt="avatar" style={{width: 100, height: 100, borderRadius: '50%'}}/>):(<Avatar size={100} icon={<UserOutlined/>}/>)}
     </Upload>
   )
 }

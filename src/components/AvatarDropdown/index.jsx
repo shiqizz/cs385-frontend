@@ -1,6 +1,6 @@
 import React from 'react'
 import { LogoutOutlined, SmileOutlined, UserOutlined } from '@ant-design/icons'
-import { Dropdown, Space, Typography, message, Avatar } from 'antd'
+import { Dropdown, Space, Typography, message, Avatar, Image } from 'antd'
 import UserModal from './UserModal'
 import { useNavigate } from 'react-router-dom'
 
@@ -35,24 +35,29 @@ const items = [
   },
 ]
 // display the corresponding content according to the login status
-localStorage.getItem('token') ? items.splice(1, 1) : items.splice(2, 1)
+const user = localStorage.getItem('user')
+user ? items.splice(1, 1) : items.splice(2, 1)
+let avatar = localStorage.getItem('avatar')
 
-const User = () => {
+const AvatarDropdown = () => {
   const navigate = useNavigate()
 
   return (
-    <Dropdown
-      menu={{
-        items,
-      }}
-    >
-      <a onClick={(e) => e.preventDefault()}>
+    <div style={{ float: 'right'}}>
+      <Dropdown
+        menu={{
+          items,
+        }}
+      >
         <Space>
-          <Avatar size={64} style={{float: 'right', margin: "5px 20px 0 0"}} icon={<UserOutlined />} onClick={() => {navigate('/profile')}}/>
+          <Avatar size={64} style={{float: 'right', margin: "5px 20px 0 0"}}
+                  icon={(avatar)?(<img src={avatar} alt={'avatar'}/>):(<UserOutlined />)}
+                  onClick={() => {navigate('/profile')}}/>
         </Space>
-      </a>
-    </Dropdown>
+      </Dropdown>
+    </div>
+
   )
 }
 
-export default User
+export default AvatarDropdown

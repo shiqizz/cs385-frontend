@@ -2,8 +2,9 @@ import React, { useContext } from 'react'
 import { MailOutlined, LockOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Form, Input, Typography, message } from 'antd'
 import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../../firebase'
+import { auth, db } from '../../firebase'
 import { AuthContext } from '../../context/AuthContext'
+import { getDoc, doc } from 'firebase/firestore'
 const { Text, Link } = Typography
 
 const LoginForm = (props) => {
@@ -14,12 +15,13 @@ const LoginForm = (props) => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user
-        // store userinfo
-        localStorage.setItem('token', user.accessToken)
+        // store in context
         dispatch({ type: 'LOGIN', payload: user })
-        localStorage.setItem('avatar', user.avatar)
+        getDoc(doc(db, 'user', user.uid)).then((doc) => {
+          localStorage.setItem('avatar', doc.data().avatar)
+        })
         message.success('login success')
-        setTimeout(() => window.location.reload(), 500)
+        setTimeout(() => window.location.reload(), 300)
       })
       .catch((error) => {
         message.error('Email doesn\'t exist or password is wrong')

@@ -4,10 +4,9 @@ import Router from './router'
 import { AuthContextProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  // <Fragment>
-  //   <AuthContextProvider>
-  //     <Router />
-  //   </AuthContextProvider>
-  // </Fragment>,
-  <Router />
+  <Fragment>
+    <AuthContextProvider>
+      <Router />
+    </AuthContextProvider>
+  </Fragment>,
 )
